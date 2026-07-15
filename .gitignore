@@ -31,7 +31,20 @@ MANIFEST
 #   before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
+# Step temporali della simulazione OpenFOAM (rigenerabili, pesanti)
+/[0-9]*/
+!/0/
 
+# Post-processing e log
+postProcessing/
+processor*/
+log.*
+*:Zone.Identifier
+# Mesh generata (rigenerabile, spesso pesante)
+constant/polyMesh/
+
+# File di controllo ParaView (vuoto, si rigenera con "touch case.foam")
+*.foam
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt

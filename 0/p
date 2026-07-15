@@ -1,0 +1,54 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  www.openfoam.com
+    \\  /    A nd           |
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      p;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -2 0 0 0 0];
+
+internalField   uniform 0;
+
+boundaryField
+{
+    inlet
+    {
+        type            zeroGradient; // La pressione all'ingresso si adatta
+    }
+
+    outlet
+    {
+        type            fixedValue;
+        value           uniform 0;    // Pressione zero all'uscita (riferimento)
+    }
+
+    walls
+    {
+        type            zeroGradient; // Muri del tunnel
+    }
+  aerofreno
+    {
+        type            zeroGradient;
+    }
+    top
+    {
+        type            zeroGradient;
+    }
+
+    // Questo è fondamentale: deve corrispondere al nome che daremo nel snappyHexMesh
+    "aerofreno"
+    {
+        type            zeroGradient;
+    }
+}
+
+// ************************************************************************* //

@@ -1,0 +1,158 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  www.openfoam.com
+    \\  /    A nd           |
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      snappyHexMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+castellatedMesh true;
+snap            true;
+addLayers       true;
+
+geometry
+{
+    NACA_brake_CAD.stl { 
+                         type triSurfaceMesh;
+                         name aerofreno; 
+                        }
+    
+    // Questa è la scatola per la scia
+      wakeBox
+     {
+        type box;
+        min (-0.005 -0.01 -0.1);
+        max (0.05   0.01 -0.075); 
+    }
+};
+
+
+castellatedMeshControls
+{
+    maxLocalCells 1000000;
+    maxGlobalCells 2000000;
+    minRefinementCells 10;
+    nCellsBetweenLevels 3;
+    
+    // Richiesti da v2312
+    resolveFeatureAngle 30;
+    allowFreeStandingZoneFaces true;
+
+    features
+    (
+        { file "NACA_brake_CAD.eMesh"; level 2; }
+    );
+
+    refinementSurfaces
+    {
+        aerofreno { level (1 2); }
+    }
+
+    refinementRegions
+    {
+         aerofreno 
+        { 
+            mode distance; 
+            levels ((0.0005 3) (0.001 2));
+         }
+
+         wakeBox
+     {
+        mode inside;
+        levels ((1 2)); // Qui è dove creiamo il "muro" di celle per la scia
+     }
+    
+    }
+
+    locationInMesh (0.01 0 -0.08); 
+}
+
+snapControls
+{
+    nSmoothPatch 3;
+    tolerance 2.0;
+    nSolveIter 30;
+    nRelaxIter 5;
+    nFeatureSnapIter 10;
+    
+    // Parametri snapping v2312
+    explicitFeatureSnap true;
+    implicitFeatureSnap false;
+    multiRegionFeatureSnap false;
+}
+
+addLayersControls
+{
+    relativeSizes       false;
+    nGrow               1; // Reinserito qui all'inizio
+    nBufferCellsNoExtrude 0;
+    nLayerIter          100;
+    nRelaxIter          5;
+
+    nSmoothSurfaceNormals 1;
+    nSmoothNormals      3;
+    nSmoothThickness    3;
+
+    expansionRatio      1.3;
+    firstLayerThickness 7.8e-06;
+    minThickness        2e-06;
+
+    meshEdgeSmoothingRatio 3.0;
+    maxIterationOffMesh 5;
+    outerAngle          110;
+    featureAngle        130;
+    slipVelocityFactor  1.0;
+
+    maxFaceThicknessRatio 0.5;
+    maxThicknessToMedialRatio 0.3;
+    minMedialAxisAngle  130;
+
+    
+    layers
+    {
+        "aerofreno"
+        {
+            nSurfaceLayers 11;
+        }
+    }
+}
+meshQualityControls
+{
+    // --- IMPOSTAZIONI RILASSATE DELLA VECCHIA TESI ---
+    relaxed 
+    { 
+        maxNonOrtho 100; 
+    }   
+    // -------------------------------------------------
+
+    maxNonOrtho 80;
+    maxBoundarySkewness 30;
+    maxInternalSkewness 8;
+    maxConcave 80;
+    minVol 1e-15;          // Portalo a 1e-15 come avevamo detto per dare tolleranza
+    minTetQuality 1e-30;
+    minArea -1;
+    minTwist 0.02;
+    minDeterminant 0.0001;
+    minFaceWeight 0.01;     // Portalo a 0.01
+    minVolRatio 0.01;
+    
+    errorReduction 0.75;
+    nSmoothScale 4;
+    minTriangleTwist -1;
+    minFlatness 0.5;
+    minTetShapeConfig 1e-30;
+    minAreaRatio -1;
+}
+
+mergeTolerance 1e-6;
+
+// ************************************************************************* // 

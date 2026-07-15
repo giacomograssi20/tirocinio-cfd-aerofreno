@@ -1,0 +1,94 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  www.openfoam.com
+    \\  /    A nd           |
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     simpleFoam;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+// Mettiamo 1000 per dare tempo ai residui di scendere
+endTime         500;
+
+deltaT          1;
+
+writeControl    runTime;
+
+// Salva i risultati ogni 100 iterazioni (così non esplode la memoria)
+writeInterval   50;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+functions
+{
+    forces
+    {
+        type            forces;
+        libs            (forces);
+        writeControl    timeStep;
+        timeInterval    1;
+
+        patches         (aerofreno);
+        
+        rho             rhoInf;
+        rhoInf          1.225;
+
+        CofR            (0 0 0);
+        dragDir         (1 0 0);
+        liftDir         (0 0 1);
+    }
+
+    forceCoeffs
+    {
+        type            forceCoeffs;
+        libs            (forces);
+        writeControl    timeStep;
+        writeInterval   1;
+        
+        patches         ( aerofreno );
+        
+        // Direzioni assi (X è il Drag, Y è il Lift)
+        dragDir         (1 0 0);
+        liftDir         (0 1 0);
+        pitchAxis       (0 0 1);
+        
+        //  dati reali per l'adimensionalizzazione:
+        magUInf         30;         // Velocità del flusso (30 m/s)
+        rho             rhoInf;     // Prende la densità dal fluido
+        rhoInf          1.225;      // Densità aria standard
+        CofR            (0 0 0);    // Centro di rotazione per i momenti
+        Aref           0.000144;   // La tua area di 1.2cm x 1.2cm in m²
+        lRef            0.012;      // Lunghezza di riferimento (1.2 cm in metri)
+        chord           0.012;      // Corda di riferimento (1.2 cm in metri)
+    }
+
+}
+
+// ************************************************************************* //

@@ -1,0 +1,54 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  www.openfoam.com
+    \\  /    A nd           |
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (30 0 0); // Alzata a 10 m/s per vedere meglio il flusso
+
+boundaryField
+{
+    inlet
+    {
+        type            fixedValue;
+        value           uniform (30 0 0);
+    }
+
+    outlet
+    {
+        type            zeroGradient;
+    }
+
+    walls
+    {
+        type            noSlip; // L'aria si ferma sulle pareti del tunnel
+    }
+    aerofreno
+    {
+        type            noSlip;
+    }
+    top
+    {
+        type            slip;   // Il "soffitto" non frena il flusso
+    }
+
+    // Questa regola si applica alla tua piastra NACA_brake_CAD.stl
+    "aerofreno"
+    {
+        type            noSlip; // Condizione di muro: l'aria sbatte e si ferma
+    }
+}
+
+// ************************************************************************* //
